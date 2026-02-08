@@ -6,9 +6,6 @@ layout: "about"
 ---
 
 ## Mi nombre es Octavio Benjamin Mendez 👋
-<div style="text-align: center; margin: 2rem 0;">
-    <img src="/images/me.jpg" alt="Foto de Octavio" style="width: 300px; height: 300px; object-fit: cover; border-radius: 50%; margin: 0 auto;">
-</div>
 Soy estudiante de Ingeniería en Sistemas de Información (Córdoba, Argentina) y un apasionado por los sistemas IT.
 Coincidero que mi curiosidad me ayuda todos los dias a seguir aprendiendo.
 
