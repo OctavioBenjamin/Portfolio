@@ -1,0 +1,101 @@
++++
+title = "Backups en casa"
+date = "2025-02-07"
+description = "¿Qué hago si no tengo un segundo disco en mi server para realizar mis backups?"
+tags = ["server", "homelab", "ubuntu-server", "backups"]
+featured = true
++++
+## Problematica
+Mi servidor principal [Abyss](/projects/homelab.md) corre 24/7 alojando servicios y almacenando archivos, tanto personales como de configuración y scripts de automatización. 
+
+El problema no es hacer el backup, el problema es, donde lo hago si mi server no tiene un segundo disco. No tiene sentido guardar el backup en el mismo disco que los archivos importantes. 
+
+Decidí mandar todo el backup a mi pc principal `knight.hollownest.lan` pero surgio otro problema.
+¿Qué pasa si no estoy en casa?
+
+
+## Solución
+Desarrollé un script alojado en **Abyss** que automatiza el respaldo mediante tres fases lógicas:
+
+### Fase 1: Gestión de Energía (Wake-on-LAN)
+El script verifica el estado de **Knight**. Si está apagada, envía un "Magic Packet" (WoL) para despertarla remotamente y espera a que los servicios SSH estén disponibles.
+
+### Fase 2: Sincronización Segura
+Una vez establecida la conexión, se ejecuta `rsync` sobre SSH, realizando el backup en otro disco.
+
+### Fase 3: Decisión de Apagado (Detección de Presencia)
+Aquí reside la lógica clave del sistema. Para decidir si **Knight** debe volver a apagarse, el script consulta el estado de **Sly** (mi celular) en la red:
+
+* **Si Sly NO responde (Offline):** Se asume que estoy fuera de casa. El sistema envía la orden de apagado a **Knight** para ahorrar energía.
+* **Si Sly responde (Online):** Se asume que estoy presente dentro de casa. El script finaliza **sin** apagar el equipo, evitando interrupciones en mi flujo de trabajo.
+
+## Flujo de trabajo
+![Flujo de trabajo del backup](/images/backup.png)
+
+## Script
+
+```shell
+#!/bin/bash
+
+# --- CONFIGURACIÓN ---
+# Host de destino (PC principal)
+TARGET_HOST="192.168.0.100"
+TARGET_MAC="aa:bb:cc:dd:ee:ff"
+TARGET_USER="sysadmin"
+BACKUP_DIR="/home/$TARGET_USER/backups/server/"
+
+# Dispositivo de control (Celular para detección de presencia)
+PRESENCE_DEVICE="192.168.0.150"
+
+# Directorios a respaldar
+SOURCE_FILES="/opt/docker/configs"
+
+# --- LÓGICA DEL WORKFLOW ---
+
+echo "[INFO] Iniciando protocolo de respaldo..."
+
+# 1. VERIFICACIÓN DE ESTADO (WAKE-ON-LAN)
+if ping -c 1 -W 1 "$TARGET_HOST" &> /dev/null; then
+    echo "[STATUS] El host $TARGET_HOST está ENCENDIDO."
+    INITIAL_STATE="on"
+else
+    echo "[STATUS] El host $TARGET_HOST está APAGADO. Enviando Magic Packet..."
+    wakeonlan "$TARGET_MAC"
+    INITIAL_STATE="off"
+    
+    # Esperar a que el host inicie servicios (SSH)
+    echo "[WAIT] Esperando inicio del sistema (120s)..."
+    sleep 120
+fi
+
+# 2. EJECUCIÓN DEL BACKUP (RSYNC)
+echo "[TASK] Sincronizando archivos..."
+# Se asume autenticación por llave SSH
+if rsync -avz --delete "$SOURCE_FILES" "$TARGET_USER@$TARGET_HOST:$BACKUP_DIR"; then
+    echo "[SUCCESS] Respaldo completado correctamente."
+else
+    echo "[ERROR] Falló la transferencia rsync."
+    exit 1
+fi
+
+# 3. GESTIÓN DE ENERGÍA (PRESENCE CHECK)
+# Si la PC se encendió solo para el backup, decidimos si apagarla.
+if [ "$INITIAL_STATE" == "off" ]; then
+    echo "[CHECK] Verificando presencia del usuario..."
+    
+    # Si el dispositivo móvil NO responde ping, no estoy.
+    if ! ping -c 1 -W 1 "$PRESENCE_DEVICE" &> /dev/null; then
+        echo "[AUTO] Usuario ausente. Apagando host remoto para ahorrar energía."
+        ssh -t "$TARGET_USER@$TARGET_HOST" "sudo shutdown -h now"
+    else
+        echo "[AUTO] Usuario detectado en la red. El host permanecerá encendido."
+    fi
+else
+    echo "[INFO] El host ya estaba encendido previamente. No se requiere acción de apagado."
+fi
+
+echo "[INFO] Fin del proceso."
+```
+
+Para finalizar este script corre de forma automatizada, definiendo su ejecución en el archivo `/etc/crontab`
+

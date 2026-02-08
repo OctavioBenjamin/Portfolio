@@ -1,0 +1,217 @@
+baseURL = 'https://tudominio.github.io' # CAMBIAR: Tu URL final (ej: octaviobenjamin.github.io)
+languageCode = 'es-ar'
+title = 'Mendez Octavio'
+theme = "minimal-black"
+
+# Habilitar búsqueda y manifiesto web
+[outputs]
+  home = ["HTML", "RSS", "JSON", "WebAppManifest"]
+
+[outputFormats.WebAppManifest]
+  mediaType = "application/manifest+json"
+  rel = "manifest"
+  baseName = "manifest"
+  isPlainText = true
+  notAlternative = true
+
+[params]
+  brand = "Mendez Octavio Benjamin"
+  description = "Mi Portfolio como SysAdmin, Infraestructura y Soporte."
+
+  # Favicon - Coloca tus archivos en la carpeta /static/
+  favicon = "icons/linux-svgrepo-com.svg"
+  appleTouchIcon = "apple-touch-icon.png"
+
+  # Logo 
+  logo = "icons/linux-svgrepo-com.svg"
+
+  # Textos introductorios 
+  #projectsIntro = "Una colección de mis implementaciones, scripts y laboratorios."
+
+  # Configuración PWA
+  [params.manifest]
+    themeColor = "#a855f7"
+    backgroundColor = "#000000"
+    categories = ["portfolio", "sysadmin", "devops"]
+
+  # Tema por defecto
+  [params.theme]
+    defaultTheme = "dark" 
+
+  # Configuración de la Página de Inicio (Home)
+  [params.home]
+    # Secciones activas
+    sections = ["hero", "now", "tech-marquee", "projects"]
+    showNowSection = true
+    showFeaturedProjects = true
+    showLatestPosts = true
+    featuredProjectsLimit = 3
+    latestPostsLimit = 3
+    
+    # Títulos traducidos
+    projectsTitle = "Proyectos Destacados"
+    projectsSubtitle = "Infraestructura como Código y Labs"
+    techMarqueeLabel = "Stack Tecnológico" # El texto que se mueve
+
+    # --- STACK TECNOLÓGICO ---
+    # Iconos tomados de Devicon. 
+
+    [[params.home.tech]]
+      label = "Linux"
+      icon = "devicon-linux-plain"
+
+    [[params.home.tech]]
+      label = "Fedora"
+      icon = "devicon-fedora-plain"
+
+    [[params.home.tech]]
+      label = "Arch"
+      icon = "devicon-archlinux-plain"
+
+    [[params.home.tech]]
+      label = "Bash"
+      icon = "devicon-bash-plain"
+
+    [[params.home.tech]]
+      label = "Docker"
+      icon = "devicon-docker-plain"
+
+    [[params.home.tech]]
+      label = "Python"
+      icon = "devicon-python-plain"
+
+    [[params.home.tech]]
+      label = "Git"
+      icon = "devicon-git-plain"
+
+    # Segunda fila (Reverse)
+
+    [[params.home.techReverse]]
+      label = "Vim"
+      icon = "devicon-vim-plain" 
+
+    [[params.home.techReverse]]
+      label = "SSH"
+      icon = "devicon-ssh-original-wordmark"      
+      
+    [[params.home.techReverse]]
+      label = "Java"
+      icon = "devicon-java-plain"      
+
+    [[params.home.techReverse]]
+      label = "JavaScript"
+      icon = "devicon-javascript-plain"      
+
+    [[params.home.techReverse]]
+      label = "React"
+      icon = "devicon-react-plain"      
+
+    [[params.home.techReverse]]
+      label = "MySql"
+      icon = "devicon-mysql-plain"      
+
+    [[params.home.techReverse]]
+      label = "NodeJs"
+      icon = "devicon-nodejs-plain"      
+
+  # Configuración Hero (presentación principal)
+  [params.hero]
+    badge = "SysAdmin | Infraestructura" # Etiqueta pequeña sobre el título
+    title = "👋Hola, soy Octavio."
+    role = "Estudiante de Ingeniería en Sistemas (UTN FRC)"
+    summary = "Me especializo en administración de sistemas e infraestructura. Me apasiona aprener sobre linux y el software libre. Construyo laboratorios en casa y rompo cosas para aprender cómo arreglarlas."
+    #avatar = "images/me.jpg" 
+    location = "Córdoba, Argentina"
+    
+    # Estado actual
+    available = true
+    availableLabel = "Disponible para proyectos"
+
+    # Sección "Qué estoy haciendo ahora"
+    nowLabel = "System Status"
+    nowIntro = ""
+    now = [
+      "⚙️Trabajo como soporte y operador de redes.",
+      "🏡Mejorando mi Homelab.",
+      "🥷Profundizando sobre Ciberseguridad."
+    ]
+
+    # Botones principales
+    [params.hero.primary]
+      label = "Ver Proyectos"
+      href = "/projects/"
+
+  # Librerías de iconos
+  [params.icons]
+    useFontAwesome = true
+    useDevicon = true
+
+  # Redes Sociales 
+  [[params.social]]
+    label = "GitHub"
+    url = "https://github.com/octaviobenjamin" # Tu usuario real
+    icon = "fa-brands fa-github"
+
+  [[params.social]]
+    label = "LinkedIn"
+    url = "https://www.linkedin.com/in/octaviobenjamin/"
+    icon = "fa-brands fa-linkedin-in"
+
+# Menú de Navegación
+[menu]
+  [[menu.main]]
+    name = "Inicio"
+    pageRef = "/"
+    url = "/"
+    weight = 1
+    identifier = "home"
+    [menu.main.params]
+      icon = "fa-solid fa-house"
+
+  [[menu.main]]
+    name = "Sobre Mí"
+    pageRef = "about"
+    url = "/about/"
+    weight = 2
+    identifier = "about"
+    [menu.main.params]
+      icon = "fa-regular fa-user"
+
+  [[menu.main]]
+    name = "Proyectos"
+    pageRef = "projects"
+    url = "/projects/"
+    weight = 3
+    identifier = "projects"
+    [menu.main.params]
+      icon = "fa-solid fa-terminal" # Cambié el icono a terminal, queda mejor
+
+# Configuración técnica
+[markup]
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 4
+
+  [markup.goldmark.renderer]
+    unsafe = true # Permite HTML dentro de Markdown (útil para iframes o diagramas)
+
+  [markup.goldmark.extensions]
+    typographer = true
+    linkify = true
+    table = true
+    strikethrough = true
+    taskList = true
+    
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    style = "monokai" # Estilo de colores para el código
+    tabWidth = 2
+
+[taxonomies]
+  tag = "tags"
+  category = "categories"
+
+[privacy]
+  [privacy.youtube]
+    privacyEnhanced = true
